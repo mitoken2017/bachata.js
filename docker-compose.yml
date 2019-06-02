@@ -1,14 +1,25 @@
-version: "3"
+version: "3.1"
 
 services:
   nuxt:
     build: ./app/
     container_name: nuxt
+    links:
+      - mongo
     restart: always
     ports:
       - "3000:3000"
     command:
       "npm run start"
+  
+  mongo:
+    image: mongo
+    container_name: mongo
+    volumes:
+      - ./mongo:/data/db
+      - ./mongo:/etc/mongo/mongod.conf
+    ports:
+      - "27017:27017"
 
   nginx:
     image: nginx:1.15

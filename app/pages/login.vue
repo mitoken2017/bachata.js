@@ -1,0 +1,130 @@
+<template>
+    <v-container>
+        <v-layout row wrap justify-center align-center>
+            <v-flex  xs12 sm6  md-5 pa-6 my-5>
+                <p class="title grey--text darken-4--text text-xs-center" >Login</p>
+                <v-card class="pa-4">
+                <v-card-text >
+                    <v-form
+                        ref="form"
+                        v-model="valid"
+                        lazy-validation
+                        >
+
+                        <v-text-field
+                            v-model="email"
+                            :rules="emailRules"
+                            label="E-mail"
+                            required>
+                        </v-text-field>
+                        
+                        <v-text-field
+                            v-model="password"
+                            :append-icon="show1 ? 'visibility' : 'visibility_off'"
+                            :rules="passRules"
+                            :type="show1 ? 'text' : 'password'"
+                            label="Password"
+                            @click:append="show1 = !show1">
+                        </v-text-field>
+
+                        <v-btn
+                        :disabled="!valid"
+                        color="green darken-4 white--text"
+                        @click="validate"
+                        
+                        >
+                        Ingresar
+                        </v-btn>
+                        <v-btn
+                        :disabled="!valid"
+                        color="green darken-4 white--text"
+                        @click="register"
+                        
+                        >
+                        Registrar
+                        </v-btn>
+                    </v-form>
+                </v-card-text>
+            </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
+</template>
+<script>
+export default {
+    // fetch ({ store, params }) {
+    //     return axios.get('http://my-api/stars')
+    //     .then((res) => {
+    //     store.commit('setStars', res.data)
+    //     })
+    // },
+    data(){
+        return {
+            valid: true,
+            show1: false,
+            email: '',
+            emailRules:[
+                v => !!v || "E-mail requerido.",
+                v => /.+@.+.+/.test(v) || 'Ingresa un e-mail válido.'
+            ],
+            password:'',
+            passRules:[
+                v =>  !!v || 'Requerido.'
+            ]
+        }
+    },
+    created(){
+        if(this.$store.state.authUser){
+            this.$router.push('/admin')
+        }
+    },
+    methods:{
+        validate () {
+            const app = this
+            if (app.$refs.form.validate()) {
+                app.snackbar = true
+                app.login()
+            }
+        },
+        reset () {
+            this.$refs.form.reset()
+        },
+        async login() {
+            let app =  this
+            try {
+                await app.$store.dispatch('login', {
+                    email: app.email,
+                    password: app.password
+                })
+                // app.reset();
+            } catch (e) {
+                app.$notify({
+                    group: 'guest',
+                    title: 'Error',
+                    type: 'error',
+                    text: 'Credenciales incorrectas.'
+                });
+                app.reset();
+            }
+        },
+        async register() {
+            let app =  this
+            try {
+                await app.$store.dispatch('register', {
+                    email: app.email,
+                    password: app.password
+                })
+                // app.reset();
+            } catch (e) {
+                app.$notify({
+                    group: 'guest',
+                    title: 'Error',
+                    type: 'error',
+                    text: 'Credenciales incorrectas.'
+                });
+                app.reset();
+            }
+        },
+    },
+}
+</script>
